@@ -16,6 +16,10 @@ version_tbb=2020
 version_mesh=51222e7
 version_sc=master
 
+# bench versions
+version_lean=v3.4.2
+version_redis=5.0.7
+
 # allocators
 setup_je=0
 setup_tc=0
@@ -342,7 +346,7 @@ fi
 phase "install benchmarks"
 
 if test "$setup_lean" = "1"; then
-  phase "build lean v3.4.1"
+  phase "build lean $version_lean"
 
   pushd $devdir
   if test -d lean; then
@@ -351,26 +355,26 @@ if test "$setup_lean" = "1"; then
     git clone https://github.com/leanprover/lean
   fi
   cd lean
-  git checkout v3.4.1
+  git checkout $version_lean
   mkdir -p out/release
   cd out/release
-  env CC=gcc CXX="g++ -Wno-exceptions" cmake ../../src -DCUSTOM_ALLOCATORS=OFF
+  cmake ../../src -DCUSTOM_ALLOCATORS=OFF
   make -j $procs
   popd
 fi
 
 if test "$setup_redis" = "1"; then
-  phase "build redis 5.0.3"
+  phase "build redis $version_redis"
 
   pushd "$devdir"
-  if test -d "redis-5.0.3"; then
-    echo "$devdir/redis-5.0.3 already exists; no need to download it"
+  if test -d "redis-$version_redis"; then
+    echo "$devdir/redis-$version_redis already exists; no need to download it"
   else
-    wget "http://download.redis.io/releases/redis-5.0.3.tar.gz"
-    tar xzf "redis-5.0.3.tar.gz"
+    wget "http://download.redis.io/releases/redis-$version_redis.tar.gz"
+    tar xzf "redis-$version_redis.tar.gz"
   fi
 
-  cd "redis-5.0.3/src"
+  cd "redis-$version_redis/src"
   make USE_JEMALLOC=no MALLOC=libc
   popd
 fi
